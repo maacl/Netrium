@@ -10,13 +10,13 @@ import Text.XML.HaXml.Types (QName(..))
 import Text.XML.HaXml.XmlContent
 import Data.Time
 
-attrStr :: Monad m => QName -> Element t -> m String
+attrStr :: MonadFail m => QName -> Element t -> m String
 attrStr n (Elem _ as _) =
     case lookup n as of
       Nothing -> fail ("expected attribute " ++ localName n)
       Just av -> return (attr2str av)
 
-attrRead :: (Read b, Monad m) => QName -> Element t -> m b
+attrRead :: (Read b, MonadFail m) => QName -> Element t -> m b
 attrRead n e = do
     str <- attrStr n e
     case reads str of

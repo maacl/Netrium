@@ -74,14 +74,16 @@ unTEs (TEs x) = x
 instance Functor TimedEvents where
   fmap f (TEs tes) = TEs [ (t,f e) | (t,e) <- tes ]
 
-instance Monoid a => Monoid (TimedEvents a) where
-  mempty        = TEs []
-  mappend as bs =
-      fmap mappendMergeResult (mergeEvents as bs)
+instance Semigroup a => Semigroup (TimedEvents a) where
+  as <> bs =
+    fmap mappendMergeResult (mergeEvents as bs)
     where
-      mappendMergeResult (OnlyInLeft  a)   = a
-      mappendMergeResult (InBoth      a b) = a `mappend` b
-      mappendMergeResult (OnlyInRight   b) =             b
+      mappendMergeResult (OnlyInLeft a) = a
+      mappendMergeResult (InBoth a b) = a <> b
+      mappendMergeResult (OnlyInRight b) = b
+
+instance Semigroup a => Monoid (TimedEvents a) where
+  mempty = TEs []
 
   -- mconcat = --TODO: optimise mconcat to do more balanced merges
 
